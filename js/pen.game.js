@@ -7,6 +7,7 @@
 	
 	game.clearState = function(){
 		state.keys = new MinimalSet();
+		state.phase = 'enter';  
 	};
 	game.clearState();
 	
