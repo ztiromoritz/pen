@@ -3,10 +3,18 @@ jQuery(function(){
 	var stage = new createjs.Stage(canvas);
 	var ctx = canvas.getContext('2d');
 	
+	pen.game.init();
+	pen.game.bind();
+	
 	var ship = new pen.Ship();
 	
-	var ticker = createjs.Ticker;
+	var bg = new pen.Background();
+
+	stage.addChild(ship);
 	
-	ticker.addEventListener('tick', pen.game.tick(stage,[ship]) );
+	
+	
+	createjs.Ticker.setFPS(50);
+	createjs.Ticker.addEventListener('tick', pen.game.tick(stage,[ship]) );
 	
 });

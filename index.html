@@ -3,15 +3,18 @@
 	<head>
 		<title>Pen - My LD32 game</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<script src="bower_components/jquery/dist/jquery.js" type="text/javascript"></script> 
-		<script src="bower_components/easeljs/lib/easeljs-NEXT.combined.js" type="text/javascript"></script>
-		<script src="node_modules/garfunkel/build/garfunkel.js" type="text/javascript"></script>
+		<script src="bower_components/jquery/dist/jquery.js" ></script> 
+		<script src="bower_components/easeljs/lib/easeljs-NEXT.combined.js" ></script>
+		<script src="node_modules/garfunkel/build/garfunkel.js" ></script>
 		
-		<script src="js/tools/tools.size.js"></script>
+		<script src="js/tools/size.js" ></script>
+		<script src="js/tools/set.js"></script>
+		<script src="js/tools/consts.js"></script>
 		
 		<script src="js/pen.init.js"></script>
 		<script src="js/objects/pen.ship.js"></script>
-		
+		<script src="js/objects/pen.background.js"></script>
+
 		<script src="js/pen.game.js"></script>
 		<script src="js/pen.js"></script>
 
@@ -19,7 +22,10 @@
 	</head>
 	<body>
 		<div id="container">
-			<canvas id="mainCanvas" width="600" height="400"></canvas>
+			<div id="menu">
+				
+			</div>
+			<canvas id="mainCanvas" width="400" height="600"></canvas>
 		</div>
 	</body>
 </html>
