@@ -1,80 +1,84 @@
-(function(pen){
-	
-	
+(function(pen) {
+
 	var velocity = ENEMY_ENTER;
-	
-	
-	
-	var c = function(color){
-		
-		switch(color){
-			case 'red':
-				return '#EE1111';
-			case 'blue':
-				return '#11FF22';
-			case 'green':
-				return '#1122EE';
-			
+
+	var c = function(color) {
+
+		switch(color) {
+		case 'red':
+			return '#EE1111';
+		case 'blue':
+			return '#11FF22';
+		case 'green':
+			return '#1122EE';
+
 		}
-		
+
 	};
-	
-	var getVelocity =  function(state){
-		switch(state.phase){
-			case 'enter':
-				return ENEMY_ENTER;
-			case 'draw':
-				return ENEMY_DRAW;
-			case 'attack':
-				return ENEMY_ATTACK;
-			default:
-				return 0;	
+
+	var getVelocity = function(state) {
+		switch(state.phase) {
+		case 'enter':
+			return ENEMY_ENTER;
+		case 'draw':
+			return ENEMY_DRAW;
+		case 'attack':
+			return ENEMY_ATTACK;
+		default:
+			return 0;
 		}
-		
+
 	};
-	
-	
-	
-	
-	var Enemy = function(options){
-		
-		options = options || {};
-		
+
+	var Enemy = function(options, stage) {
+
 		this.Container_constructor();
 		this.body = new createjs.Shape();
 		this.addChild(this.body);
 		
-		
-		this.colors = options.colors || ['red', 'blue', 'green'];
-		
+		this.init( options );
 		
 		this.initBody();
 		
-		this.x = 200;
-		this.y = -50;
+		
 		
 	};
 	
+	
+
 	var enemy = createjs.extend(Enemy, createjs.Container);
-
-
+	
+	enemy.init = function(options){
+		options = options || {};
+		this.colors = options.colors || ['red', 'blue', 'green'];
+		this.radius = this.colors.length * 10;
+		this.x = 200;
+		this.y = -50;
+	};
+	
+	
 	enemy.initBody = function() {
 		var g = this.body.graphics;
 		g.beginStroke(null);
-		
+
 		var l = this.colors.length;
-		while(l--){
-			g.beginFill(c(this.colors[l])).drawCircle(0,0,(l + 1 )*10);
+		while (l--) {
+			g.beginFill(c(this.colors[l])).drawCircle(0, 0, (l + 1 ) * 10);
 		}
 	};
-	
-	
-	enemy.tick = function(event, state){
+
+	enemy.tick = function(event, state) {
 		var v = getVelocity(state) * event.delta;
 		this.y += v;
+			
+		if(this.y > 800) 
+		{
+			var event = new createjs.Event('boo');
+			event.enemy = this;
+			stage.dispatchEvent(event);
+		}	
 	};
-	
+
 	pen.Enemy = createjs.promote(Enemy, "Container");
-	
-	
+
 })(this.pen);

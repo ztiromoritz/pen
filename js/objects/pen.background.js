@@ -1,13 +1,13 @@
 (function(pen) {
 
-	var velocity = 0.3;
+	var velocity = BG_DRIFT;
 
 	var Background = function(options) {
 
 		options = options || {};
 
 		this.Container_constructor();
-		this.bitmapA = new createjs.Bitmap('assets/background.png');
+		this.bitmapA = new createjs.Bitmap(pen.assets['background.png']);
 		this.bitmapB = this.bitmapA.clone();
 		
 		

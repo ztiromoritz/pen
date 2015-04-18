@@ -13,6 +13,8 @@
 		this.keyDown = KEY_S || options.keyDown;
 		this.keyLeft = KEY_A || options.keyLeft;
 		this.keyRight = KEY_D || optione.keyRight;
+		
+		this.radius = 30;
 
 		this.initBody();
 		
@@ -24,7 +26,10 @@
 
 
 	ship.initBody = function() {
-		this.body.graphics.beginFill('#FFFFFF').beginStroke(null).setStrokeStyle(4).drawCircle(0, 0, 30);
+		this.body.graphics
+			.beginFill('#FFFFFF')
+			.beginStroke(null)
+			.drawCircle(0, 0, this.radius);
 	};
 
 	ship.tick = function(event, state) {
