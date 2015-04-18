@@ -1,0 +1,18 @@
+{
+  "name": "pen",
+  "version": "0.0.1",
+  "homepage": "https://ztiromoritz.github.io/pen",
+  "authors": [
+    "Moritz Rebbert <ztiromoritz@yahoo.de>"
+  ],
+  "description": "My LD 32 game",
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
