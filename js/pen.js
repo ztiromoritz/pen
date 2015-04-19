@@ -1,23 +1,21 @@
 pen.loadResources(function(){
 	var canvas = document.getElementById("mainCanvas");
 	var stage = new createjs.Stage(canvas);
-	var ctx = canvas.getContext('2d');
+	//Global Event Dispatcher
+	//Have to learn more about event handling
+	window.GED = stage;
+	var game = new pen.Game({},stage);
 	
-	pen.game.init({},stage);	
+
+	pen.snd.themeLoop();
 	
-	//hack because i dont get the event handling
-	window.stage = stage;
-	
-	var ship = new pen.Ship();
-	var bg = new pen.Background();
-	stage.addChild(bg);
-	stage.addChild(ship);
-	
-	
-	pen.game.addEnemy();
+	game.addEnemy();
+	game.addEnemy();
 
 	
-	createjs.Ticker.setFPS(50);
-	createjs.Ticker.addEventListener('tick', pen.game.tick(stage,[ship,bg]) );
-	
+	createjs.Ticker.setFPS(60);
+	createjs.Ticker.addEventListener('tick', function(event){game.tick(event);} );
+
+
+	//ui.hideInstructions();	
 });

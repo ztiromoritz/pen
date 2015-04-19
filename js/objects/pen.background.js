@@ -31,10 +31,10 @@
 		this.bitmapB.y += V;
 		
 		if(this.bitmapA.y > this.viewHeight)
-			this.bitmapA.y = -this.viewHeight;
+			this.bitmapA.y = this.bitmapB.y - this.viewHeight;
 			
 		if(this.bitmapB.y >= this.viewHeight)
-			this.bitmapB.y = - this.viewHeight;
+			this.bitmapB.y = this.bitmapA.y - this.viewHeight;
 	};
 
 	bg.initBody = function() {

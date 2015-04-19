@@ -1,6 +1,9 @@
 (function(pen) {
 
 	var velocity = ENEMY_ENTER;
+	
+	var START_OFFSET = -100;
+	var OUT = 800;
 
 	var c = function(color) {
 
@@ -18,11 +21,11 @@
 
 	var getVelocity = function(state) {
 		switch(state.phase) {
-		case 'enter':
+		case ENTER:
 			return ENEMY_ENTER;
-		case 'draw':
+		case DRAW:
 			return ENEMY_DRAW;
-		case 'attack':
+		case ATTACK:
 			return ENEMY_ATTACK;
 		default:
 			return 0;
@@ -31,17 +34,11 @@
 	};
 
 	var Enemy = function(options, stage) {
-
 		this.Container_constructor();
 		this.body = new createjs.Shape();
 		this.addChild(this.body);
-		
 		this.init( options );
-		
-		this.initBody();
-		
-		
-		
+		this.initBody();	
 	};
 	
 	
@@ -50,10 +47,10 @@
 	
 	enemy.init = function(options){
 		options = options || {};
-		this.colors = options.colors || ['red', 'blue', 'green'];
+		this.colors = def( options.colors, ['red', 'blue', 'green']);
 		this.radius = this.colors.length * 10;
-		this.x = 200;
-		this.y = -50;
+		this.x = def( options.x , 200 );
+		this.y = def( options.x , 0 ) + START_OFFSET;
 	};
 	
 	
@@ -71,11 +68,11 @@
 		var v = getVelocity(state) * event.delta;
 		this.y += v;
 			
-		if(this.y > 800) 
+		if(this.y > OUT) 
 		{
-			var event = new createjs.Event('boo');
-			event.enemy = this;
-			stage.dispatchEvent(event);
+			var e = new createjs.Event('boo');
+			e.enemy = this;
+			GED.dispatchEvent(e);
 		}	
 	};
 

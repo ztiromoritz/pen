@@ -18,6 +18,8 @@
 
 		this.initBody();
 		
+		this.vulnerable = true;
+		
 		this.x = 200 ;
 		this.y = 500;
 	};
@@ -30,26 +32,64 @@
 			.beginFill('#FFFFFF')
 			.beginStroke(null)
 			.drawCircle(0, 0, this.radius);
+			
+		this.blinkTween = createjs.Tween.get(this.body,{loop:true, paused: true}).to({ alpha:0 }, 70).to({alpha: 1},70);
+	};
+	
+	ship.hit = function(){
+		var self = this;
+		this.vulnerable = false;
+		this.blinkTween.setPaused(false);
+		setTimeout(
+			function(){ 
+				self.vulnerable = true; 
+				self.blinkTween.setPaused(true); 
+				self.body.alpha=1;
+			}, 
+			1500
+		);
+	};
+	
+	ship.blink = function(){
+		//this.blinkTween.play(this.blinkTween);
+		//createjs.Tween.play(this.blinkTween);
+	};
+	
+	
+	/**
+	 * Garfunkel TODO Syntax:
+	 *  _.v(enemy.x, enemy.y)  to  _(enemy.x, enemy.y)
+	 * Equation.dispose(_);   to _.dispose();
+	 * 
+	 */
+	ship.collides = function(enemy){
+		var minDist = enemy.radius + this.radius;
+		var _ = Equation.get();
+		
+		var dist = _.sub( _.v(enemy.x,enemy.y) , _.v(this.x,this.y) ).length();	
+		Equation.dispose(_);
+		
+		return (dist <= minDist);			
 	};
 
 	ship.tick = function(event, state) {
 		var V = velocity * event.delta;
 
-		if (state.keys.contains(this.keyUp)) {
+		if (state.hasKey(this.keyUp)) {
 			this.y -= V;
 		}
 
-		if (state.keys.contains(this.keyDown)) {
+		if (state.hasKey(this.keyDown)) {
 			this.y += V;
 		}
 
-		if (state.keys.contains(this.keyLeft)) {
+		if (state.hasKey(this.keyLeft)) {
 			this.x -= V;
 		}
 
-		if (state.keys.contains(this.keyRight)) {
+		if (state.hasKey(this.keyRight)) {
 			this.x += V;
-		}
+		}			
 	};
 
 	pen.Ship = createjs.promote(Ship, "Container");

@@ -3,6 +3,7 @@
 		global.tools = {};
 
 	global.tools.resize = function(main, border) {
+		
 		border = typeof border !== 'undefined' ? border : 0.01;
 		var mainWidth = jQuery(main).width();
 		var mainHeight = jQuery(main).height();
