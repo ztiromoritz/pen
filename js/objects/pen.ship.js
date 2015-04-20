@@ -64,10 +64,20 @@
 	 */
 	ship.collides = function(enemy){
 		var minDist = enemy.radius + this.radius;
-		var _ = Equation.get();
+		var dist = new Vect(enemy.x,enemy.y).sub(new Vect(this.x,this.y)).length();
 		
-		var dist = _.sub( _.v(enemy.x,enemy.y) , _.v(this.x,this.y) ).length();	
-		Equation.dispose(_);
+		
+		//var _ = Equation.get();
+		
+		/**
+		 Strange Bug. Equation seems not to be stable
+		var v_enemy = _.v(enemy.x,enemy.y);
+		var v_ship = _.v(this.x,this.y);
+		
+		var dist = _.sub( v_enemy , v_ship ).length();	
+		//console.log(" Vect " + enemy.x + " " + enemy.y  + "_.v "+ v_enemy );
+		*/
+		//Equation.dispose(_);
 		
 		return (dist <= minDist);			
 	};

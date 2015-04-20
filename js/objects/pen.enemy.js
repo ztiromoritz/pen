@@ -3,22 +3,15 @@
 	var velocity = ENEMY_ENTER;
 	
 	var START_OFFSET = -100;
+	
+	var DRAW_DISTANCE = 100;
+	
+	var trans = createjs.Graphics.getRGB(0xFFFFFF, 0.0);
+	
+	
 	var OUT = 800;
 
-	var c = function(color) {
-
-		switch(color) {
-		case 'red':
-			return '#EE1111';
-		case 'blue':
-			return '#11FF22';
-		case 'green':
-			return '#1122EE';
-
-		}
-
-	};
-
+	
 	var getVelocity = function(state) {
 		switch(state.phase) {
 		case ENTER:
@@ -38,7 +31,7 @@
 		this.body = new createjs.Shape();
 		this.addChild(this.body);
 		this.init( options );
-		this.initBody();	
+		this.redrawBody();	
 	};
 	
 	
@@ -49,18 +42,32 @@
 		options = options || {};
 		this.colors = def( options.colors, ['red', 'blue', 'green']);
 		this.radius = this.colors.length * 10;
+		this.disposable = false;
 		this.x = def( options.x , 200 );
-		this.y = def( options.x , 0 ) + START_OFFSET;
+		this.y = def( options.y , 0 ) + START_OFFSET;
+	};
+	
+	// steal the outmost color
+	enemy.stealColor = function(){
+		var color = this.colors.pop();
+		if(this.colors.length == 0)
+			this.disposable = true;			
+		this.radius = this.colors.length * 10;
+		this.redrawBody();
+		
+		return color;		
 	};
 	
 	
-	enemy.initBody = function() {
+	enemy.redrawBody = function() {
 		var g = this.body.graphics;
-		g.beginStroke(null);
+		g.clear();
+		g.beginFill(trans);
+		g.setStrokeStyle(null);
 
 		var l = this.colors.length;
 		while (l--) {
-			g.beginFill(c(this.colors[l])).drawCircle(0, 0, (l + 1 ) * 10);
+			g.beginFill(getColor(this.colors[l])).drawCircle(0, 0, (l + 1 ) * 10);
 		}
 	};
 
@@ -68,6 +75,10 @@
 		var v = getVelocity(state) * event.delta;
 		this.y += v;
 			
+		if(state.phase === ENTER && this.y > DRAW_DISTANCE){
+			GED.dispatchEvent('enemiesInDraw');
+		};
+		
 		if(this.y > OUT) 
 		{
 			var e = new createjs.Event('boo');

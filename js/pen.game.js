@@ -22,11 +22,15 @@
 		stage.addChild(this.background);
 		stage.addChild(this.ship);
 		
+		this.elims = [];
+		
 		this.enemyPool = function() {
 			var pool = new Garfunkel.Pool(30, pen.Enemy, pen.Enemy.prototype.init);
 			var nextId = 0;
 	
 			var live = {};
+			
+			var liveCount = 0;
 	
 			var ep = {};
 	
@@ -35,16 +39,22 @@
 				var liveId = nextId++;
 				enemy.liveId = liveId;
 				live[liveId] = enemy;
+				++liveCount;
 				return enemy;
 			};
 	
 			ep.dispose = function(enemy) {
-				pool.dispose(enemy);
 				delete live[enemy.liveId];
+				pool.dispose(enemy);
+				--liveCount;
 			};
 	
 			ep.forEach = function(func) {
 				$.each(live, func);
+			};
+			
+			ep.getLiveCount = function(){
+				return liveCount;
 			};
 	
 			return ep;
@@ -62,6 +72,7 @@
 
 		this.stage.on('boo', function(e){self.handleEnemyOutOfReach(e);});
 		this.stage.on('hit', function(e){self.handleHit(e);} );
+		this.stage.on('enemiesInDraw', function(e){self.handleEnemiesInDraw(e);});
 		window.onkeydown = function(e){
 			self.handleKeyDown(e);};
 		window.onkeyup = function(e){
@@ -89,7 +100,7 @@
 			};
 			
 			_state.phase = INIT;
-			_state.currentLevel = 0;
+			_state.currentLevel = -1;
 			_state.lives = 4;
 			
 			return _state;
@@ -98,6 +109,8 @@
 		
 		pen.ui.setLives(this.state.lives);	
 	};
+	
+	
 
 
 	Game.prototype.handleKeyDown = function(e) {
@@ -130,25 +143,42 @@
 
 	
 
-
-	
-	
-	
-
-	Game.prototype.handleEnemyOutOfReach = function(event) {	
-		//Remove Enemy 
-		this.stage.removeChild(event.enemy);
-		this.enemyPool.dispose(event.enemy);
+	Game.prototype.nextLevel = function(){
+		this.switchPhase(ENTER);
 		
+		var currentLevel = ++this.state.currentLevel;
+		if( currentLevel >= pen.levels.length){			
+			this.switchPhase(WON);
+		}else{
+			var level = pen.levels[currentLevel];
+			var n = level.enemies.length;
+			while(n--)
+				this.addEnemy(level.enemies[n]);
+		}
+		
+		
+	};
 
-		//Add new Enemy
-		var enemy = this.enemyPool.get();
-		this.stage.addChild(enemy);
+	Game.prototype.handleEnemiesInDraw = function(){
+		var self = this;
+		if(this.state.phase == ENTER){
+			this.switchPhase(DRAW);
+			//TODO: this.ui.enableDraw();
+			setTimeout(
+				function(level){ 
+					var currentLevel = level;
+					return function(){
+						if(self.state.phase === DRAW && self.state.currentLevel === currentLevel ) //Still in draw of currentLevel?
+							self.switchPhase(ATTACK);
+					};	 
+				}(this.state.currentLevel), 
+				500
+			);
+		}
 	};
 	
+	
 	Game.prototype.handleHit = function(event){
-		//this.stage.removeChild(event.enemy);
-		//this.enemyPool.dispose(event.enemy);
 		
 		if(this.ship.vulnerable){
 			this.state.lives--;
@@ -161,33 +191,68 @@
 			this.ship.hit();
 		}
 		
-		
 	};
+	
+	
+	Game.prototype.handleEnemyOutOfReach = function(event) {	
+		//Remove Enemy 
+		event.enemy.disposable = true;
+	};
+	
+	
 
 	
 	Game.prototype.addEnemy = function(options) {
 		var enemy = this.enemyPool.get(options);
 		this.stage.addChild(enemy);
+		return enemy;
+	};
+	
+	Game.prototype.removeEnemy = function(enemy){
+		this.stage.removeChild( enemy );
+		this.enemyPool.dispose( enemy );
+		console.log(this.enemyPool.getLiveCount());
+		if(this.enemyPool.getLiveCount() === 0)
+			this.switchPhase(INIT);
+	};
+	
+	
+	Game.prototype.addElimination = function(elim){
+		this.elims.push(elim);
+		this.stage.addChild(elim);
 	};
 
 	
 	Game.prototype.tick = function(event) {
+		var self = this;
 		var ship = this.ship;
 		var state = this.state;
 		var background = this.background;
 		var stage = this.stage;
 		
+		//clean up : TODO Eliminations here
+		this.enemyPool.forEach(function(key, enemy) {
+				if(enemy.disposable){
+					//Remove Enemy 
+					self.removeEnemy( enemy );
+				}
+			});
+		
+		
 		//handle state
+		if(state.phase == INIT)
+		
 		switch(state.phase) {
-		case INIT:
-			this.switchPhase(ENTER);
-			break;
+			case INIT:
+				this.nextLevel();
+				break;
 		}
 
 		//do collision and movement
 
 		this.enemyPool.forEach( function(key, enemy) {
-			enemy.tick(event, state);
+			enemy.tick( event, state );
+			 
 			if ( ship.collides(enemy) ) {
 				var e = new createjs.Event('hit');
 				e.enemy = enemy;
@@ -199,6 +264,12 @@
 		//do movement
 		ship.tick(event, state);
 		background.tick(event, state);
+		
+		var n = this.elims.length;
+		while(n--){
+			this.elims[n].tick(event, state);
+		};
+		
 
 		stage.update(event);
 	}; 

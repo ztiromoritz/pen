@@ -3,7 +3,8 @@ window.pen = {};
 var Vect = Garfunkel.Vect;
 var Equation = Garfunkel.Equation;
 
-var SHIP_VELOCITY = 0.4;
+var SHIP_VELOCITY = 0.2;
+var ELIMINATION = 0.17;
 var ENEMY_ENTER = 0.2;
 var ENEMY_DRAW = 0.0;
 var ENEMY_ATTACK = 0.2;
@@ -17,12 +18,30 @@ var INIT 		= 'init';
 var ENTER 		= 'enter';
 var DRAW 		= 'draw';
 var ATTACK		= 'attack';
+var WON			= 'won';
+var LOST		= 'lost';
 
 var LOGGING_ENABED = true;
 pen.log = function(msg){
 	if(LOGGING_ENABED)
 		console.log(msg);
 };
+
+
+var getColor = function(color) {
+
+	switch(color) {
+	case 'red':
+		return '#EE1111';
+	case 'blue':
+		return '#1122EE';
+	case 'green':
+		return '#11FF22';
+
+	}
+	
+};
+
 
 
 $(function(){

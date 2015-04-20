@@ -10,8 +10,15 @@
 	};
 	
 	
+	ui.showDrawMessage = function(){
+		jQuery('#message').text(
+			"Enemies within reach. Discord seeder activated."
+		);
+	};
+	
+	
 	ui.showInstruction = function(){
-		jQuery('#instructions').css('z-index','2');
+		jQuery('#instructions').css('z-index','5');
 	};
 	
 	ui.hideInstruction = function(){
