@@ -17,6 +17,7 @@ var MENU		= 'menu';
 var INIT 		= 'init';
 var ENTER 		= 'enter';
 var DRAW 		= 'draw';
+var DRAW_ELIMINATION = 'draw_elimination';
 var ATTACK		= 'attack';
 var WON			= 'won';
 var LOST		= 'lost';
@@ -41,6 +42,16 @@ var getColor = function(color) {
 	}
 	
 };
+
+//FPS
+var measure = 0;
+createjs.Ticker.addEventListener('tick', function(event){
+	measure = (measure + 1) % 60;
+	if(measure == 0)
+	{
+		jQuery('#fps').text('fps: ' + createjs.Ticker.getMeasuredFPS());
+	}
+});
 
 
 

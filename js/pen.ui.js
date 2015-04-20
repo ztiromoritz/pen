@@ -17,12 +17,24 @@
 	};
 	
 	
-	ui.showInstruction = function(){
-		jQuery('#instructions').css('z-index','5');
+	ui.showInstructions = function(){
+		jQuery('#instructions').css('z-index','5').show();
 	};
 	
-	ui.hideInstruction = function(){
-		jQuery('#instructions').css('z-index','-1');
+	ui.hideInstructions = function(){
+		jQuery('#instructions').css('z-index','-1').hide();
+	};
+	
+	
+	ui.showMessage = function(title, message){
+		jQuery('#message').css('z-index','5').show();
+		jQuery('#message h1').html(title);
+		jQuery('#message p').html(message);
+	};
+	
+	
+	ui.hideMessage = function(){
+		jQuery('#message').css('z-index','-1').hide();
 	};
 	
 	pen.ui = ui;

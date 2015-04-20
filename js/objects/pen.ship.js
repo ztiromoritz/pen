@@ -86,19 +86,31 @@
 		var V = velocity * event.delta;
 
 		if (state.hasKey(this.keyUp)) {
-			this.y -= V;
+			if(this.y - V > 0 + this.radius)
+				this.y -= V;
+			else
+				this.y = 0+ this.radius;
 		}
 
 		if (state.hasKey(this.keyDown)) {
-			this.y += V;
+			if(this.y + V < 600 - this.radius)
+				this.y += V;
+			else
+				this.y =  600 - this.radius;
 		}
 
 		if (state.hasKey(this.keyLeft)) {
-			this.x -= V;
+			if(this.x - V > 0 + this.radius)
+				this.x -= V;
+			else
+				this.x = 0 + this.radius;
 		}
 
 		if (state.hasKey(this.keyRight)) {
-			this.x += V;
+			if(this.x + V < 400 - this.radius )
+				this.x += V;
+			else
+				this.x = 400 - this.radius;
 		}			
 	};
 

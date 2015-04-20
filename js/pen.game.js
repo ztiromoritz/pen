@@ -1,8 +1,6 @@
 (function(pen) {
 	
 
-	
-	
 	var Game = function(options, stage) {
 			
 		this.initObjects(options, stage);
@@ -18,6 +16,7 @@
 		options = options || {};
 		this.stage = stage;
 		this.ship = new pen.Ship();
+		pen.ship = this.ship; //Hack globaly available
 		this.background = new pen.Background();
 		stage.addChild(this.background);
 		stage.addChild(this.ship);
@@ -25,7 +24,7 @@
 		this.elims = [];
 		
 		this.enemyPool = function() {
-			var pool = new Garfunkel.Pool(30, pen.Enemy, pen.Enemy.prototype.init);
+			//var pool = new Garfunkel.Pool(30, pen.Enemy, pen.Enemy.prototype.init);
 			var nextId = 0;
 	
 			var live = {};
@@ -35,7 +34,7 @@
 			var ep = {};
 	
 			ep.get = function(options) {
-				var enemy = pool.get(options);
+				var enemy = new pen.Enemy(options);//pool.get(options);
 				var liveId = nextId++;
 				enemy.liveId = liveId;
 				live[liveId] = enemy;
@@ -45,7 +44,7 @@
 	
 			ep.dispose = function(enemy) {
 				delete live[enemy.liveId];
-				pool.dispose(enemy);
+				//pool.dispose(enemy);
 				--liveCount;
 			};
 	
@@ -73,6 +72,10 @@
 		this.stage.on('boo', function(e){self.handleEnemyOutOfReach(e);});
 		this.stage.on('hit', function(e){self.handleHit(e);} );
 		this.stage.on('enemiesInDraw', function(e){self.handleEnemiesInDraw(e);});
+		this.stage.on('drawLineFinished', function(e){self.handleLineFinished(e);});
+		//this.stage.on('startPhase', function(e){self.handleStartPhase(e);});
+		
+		
 		window.onkeydown = function(e){
 			self.handleKeyDown(e);};
 		window.onkeyup = function(e){
@@ -138,7 +141,16 @@
 		
 		var event = new createjs.Event('startPhase');
 		event.phase = this.state.phase;
-		GED.dispatchEvent(event);		
+		GED.dispatchEvent(event);
+		
+		
+		//HACK: user event listener
+		if(this.state.phase === ATTACK){
+			jQuery('#container').css('cursor', 'auto');
+		}
+		if(this.state.phase === DRAW){
+			jQuery('#container').css('cursor', "url('./assets/cursor2.gif') 10 10,crosshair");
+		}	
 	};
 
 	
@@ -149,6 +161,9 @@
 		var currentLevel = ++this.state.currentLevel;
 		if( currentLevel >= pen.levels.length){			
 			this.switchPhase(WON);
+			pen.ui.showMessage('<span style="color: green;">The End</span>', 
+				'Thanks for playing.<br>Reload for replay');
+			
 		}else{
 			var level = pen.levels[currentLevel];
 			var n = level.enemies.length;
@@ -163,6 +178,9 @@
 		var self = this;
 		if(this.state.phase == ENTER){
 			this.switchPhase(DRAW);
+			jQuery('#container').css('cursor', "url('./assets/cursor2.gif') 10 10,crosshair");
+			//jQuery('#container').css('cursor', "crosshair");
+			//crosshair
 			//TODO: this.ui.enableDraw();
 			setTimeout(
 				function(level){ 
@@ -172,7 +190,7 @@
 							self.switchPhase(ATTACK);
 					};	 
 				}(this.state.currentLevel), 
-				500
+				3000
 			);
 		}
 	};
@@ -182,13 +200,16 @@
 		
 		if(this.ship.vulnerable){
 			this.state.lives--;
-			
-			pen.ui.setLives(this.state.lives);
-			if(this.state.points == 0)
-				console.log('GAME OVER');
-			pen.snd.plong();
-			
+			this.state.currentLevel--;
+			pen.snd.hit();
 			this.ship.hit();
+			pen.ui.setLives(this.state.lives);
+			if(this.state.lives == 0){
+				pen.ui.showMessage('<span style="color: red;">Game Over</span>', 
+				'Reload for replay');
+				this.state.phase = LOST;
+				console.log('GAME OVER');
+			}
 		}
 		
 	};
@@ -200,6 +221,83 @@
 	};
 	
 	
+	
+	Game.prototype.eliminate = function(left, right){
+		if(left.length === 0 || right.length === 0)
+			return false;
+		var leftEnemy = null;
+		var rightEnemy = null;
+		outer: for(var l = 0; l < left.length; l++){
+			for(var r = 0; r < right.length; r++){
+				leftEnemy = left[l];
+				rightEnemy = right[r];
+				if(leftEnemy.colors.length <= 0 || rightEnemy.colors.length <=0)
+					continue outer; //Should not happen;
+				
+				if(leftEnemy.colors[leftEnemy.colors.length - 1] === rightEnemy.colors[rightEnemy.colors.length - 1]){
+					if(leftEnemy.colors.length === 1)
+						left.splice(l,1);
+					if(rightEnemy.colors.length === 1)
+						right.splice(r,1);
+					this.addElimination(new pen.Elimination(leftEnemy, rightEnemy));
+					console.log('hier');
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	
+	
+	
+	var execElim = function(g,left, right){
+		if(g.eliminate(left,right)){
+			pen.snd.plong();
+			setTimeout(function(){execElim(g,left,right);}, 800);
+		}else{
+			g.switchPhase(DRAW);
+			setTimeout(
+				function(level){ 
+					var currentLevel = level;
+					return function(){
+						if(g.state.phase === DRAW && g.state.currentLevel === currentLevel ) //Still in draw of currentLevel?
+							g.switchPhase(ATTACK);
+					};	 
+				}(g.state.currentLevel), 
+				1000
+			);
+		}
+	};
+	
+
+	Game.prototype.handleLineFinished = function(event) {	
+		console.log("finished");
+		if(this.state.phase !== DRAW)
+			return;
+	 	this.switchPhase(DRAW_ELIMINATION);
+	 	
+	 	
+	 	var self = this;
+	 	var segment = new Garfunkel.Segment(event.p1, event.p2);
+	 	
+	 	var left = [];
+	 	var right = [];
+	 	
+	 	this.enemyPool.forEach(function(key, enemy){
+	 		var u = segment.clone().toCenter().p2;
+	 		var v = new Vect(enemy.x - segment.p1.x, enemy.y - segment.p1.y);
+	 		if(u.isLeftOf(v))
+	 		{
+	 			left.push(enemy);
+	 		}else{
+	 			right.push(enemy);
+	 		}
+	 	});
+	 	
+	 	
+	 	execElim(self,left,right);	
+		
+	};
 
 	
 	Game.prototype.addEnemy = function(options) {
@@ -211,7 +309,6 @@
 	Game.prototype.removeEnemy = function(enemy){
 		this.stage.removeChild( enemy );
 		this.enemyPool.dispose( enemy );
-		console.log(this.enemyPool.getLiveCount());
 		if(this.enemyPool.getLiveCount() === 0)
 			this.switchPhase(INIT);
 	};
@@ -230,6 +327,9 @@
 		var background = this.background;
 		var stage = this.stage;
 		
+		if(state.phase == LOST || state.phase == WON)
+			return;
+		
 		//clean up : TODO Eliminations here
 		this.enemyPool.forEach(function(key, enemy) {
 				if(enemy.disposable){
@@ -241,12 +341,7 @@
 		
 		//handle state
 		if(state.phase == INIT)
-		
-		switch(state.phase) {
-			case INIT:
-				this.nextLevel();
-				break;
-		}
+			this.nextLevel();
 
 		//do collision and movement
 

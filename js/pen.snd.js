@@ -25,18 +25,19 @@
     
   
   	snd.plong = play('data:audio/mp3;base64,' + effects.plong.wav);
-  
+  	snd.elim = play('data:audio/mp3;base64,' + effects.elim.wav);
+  	snd.draw = play('data:audio/mp3;base64,' + effects.draw.wav);
+  	snd.hit	 = play('data:audio/mp3;base64,' + effects.hit.wav);
 
     var themeLoop = function(){
     	if(!loopEnabled)
     		return;
     	var loop1 = jQuery('<audio id="audio_1" preload autoplay loop volume="0.2">')
-    		.prop('volume', 0.1)
+    		.prop('volume', 0.2)
     		.append('<source id="mp3" src="data:audio/mp3;base64,'+raw.theme1.mp3+'"></source>')
     		.append('<source id="mp3" src="data:audio/ogg;base64,'+raw.theme1.ogg+'"></source>');
     	
-    	
-    	//jQuery('body').append(loop1);	
+   
     };
     
     
