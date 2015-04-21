@@ -5,7 +5,7 @@
 	
 	var enabled = true;
 	
-	var loopEnabled = false;
+	var loopEnabled = true;
 
 	var play = function( filename ){
     		

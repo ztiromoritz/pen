@@ -105,6 +105,7 @@
 			_state.phase = INIT;
 			_state.currentLevel = -1;
 			_state.lives = 4;
+			_state.drawtime = 2500;
 			
 			return _state;
 			
@@ -120,6 +121,10 @@
 		var evt = e || window.event;
 		if (e.keyCode === 27 && !!this.onESC)//ESC
 			this.onESC();
+		if(e.keyCode === 69){
+			pen.ui.showMessage('<span style="color: red;">Nope, not working!</span>','');
+			setTimeout(function(){pen.ui.hideMessage();}, 800);
+		} //e
 		this.state.setKey(evt.keyCode);
 	};
 
@@ -166,6 +171,14 @@
 			
 		}else{
 			var level = pen.levels[currentLevel];
+			this.state.drawtime = typeof level.timeout !== 'undefined'?level.timeout:2500;
+			if(level.message)
+			{
+				pen.ui.showMessage(level.message,'');
+				
+				setTimeout(function(){pen.ui.hideMessage();}, level.messageTimeout || 800);
+				level.message = '';
+			}
 			var n = level.enemies.length;
 			while(n--)
 				this.addEnemy(level.enemies[n]);
@@ -190,7 +203,7 @@
 							self.switchPhase(ATTACK);
 					};	 
 				}(this.state.currentLevel), 
-				3000
+				this.state.drawtime
 			);
 		}
 	};
@@ -200,7 +213,8 @@
 		
 		if(this.ship.vulnerable){
 			this.state.lives--;
-			this.state.currentLevel--;
+			if(this.state.currentLevel != 3) //Direct sorry;
+				this.state.currentLevel--;
 			pen.snd.hit();
 			this.ship.hit();
 			pen.ui.setLives(this.state.lives);
@@ -253,7 +267,7 @@
 	var execElim = function(g,left, right){
 		if(g.eliminate(left,right)){
 			pen.snd.plong();
-			setTimeout(function(){execElim(g,left,right);}, 800);
+			setTimeout(function(){execElim(g,left,right);}, 150);
 		}else{
 			g.switchPhase(DRAW);
 			setTimeout(
@@ -264,7 +278,7 @@
 							g.switchPhase(ATTACK);
 					};	 
 				}(g.state.currentLevel), 
-				1000
+				3000
 			);
 		}
 	};
@@ -307,10 +321,15 @@
 	};
 	
 	Game.prototype.removeEnemy = function(enemy){
+		var self = this;
 		this.stage.removeChild( enemy );
 		this.enemyPool.dispose( enemy );
 		if(this.enemyPool.getLiveCount() === 0)
-			this.switchPhase(INIT);
+		{
+			setTimeout(function(){
+			self.switchPhase(INIT);
+			}, 2000);
+		}
 	};
 	
 	
@@ -327,7 +346,7 @@
 		var background = this.background;
 		var stage = this.stage;
 		
-		if(state.phase == LOST || state.phase == WON)
+		if(state.phase == LOST )
 			return;
 		
 		//clean up : TODO Eliminations here

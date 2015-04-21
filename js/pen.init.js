@@ -38,12 +38,30 @@ var getColor = function(color) {
 		return '#1122EE';
 	case 'green':
 		return '#11FF22';
+	case 'purple':
+		return '#BA55D3';
+	case 'yellow':
+		return '#808000';
+	case 'beige':
+		return '#A3A383';
+	case 'genf':
+		return '#FFA500';
+		
 
 	}
+	
+	/**
+	 * 				{colors : ['red', 'red'], 	 x: 150 , y: -30 },
+				{colors : ['red', 'green'], 	 x: 200 , y: -50 },
+				{colors : ['red', 'purple'],  x: 250,  y: -30 },
+				{colors : ['red', 'yellow'], x: 300,  y: -50 },
+				{colors : ['red', 'beige'], x: 350,  y: -30 },
+	 */
 	
 };
 
 //FPS
+/*
 var measure = 0;
 createjs.Ticker.addEventListener('tick', function(event){
 	measure = (measure + 1) % 60;
@@ -52,6 +70,7 @@ createjs.Ticker.addEventListener('tick', function(event){
 		jQuery('#fps').text('fps: ' + createjs.Ticker.getMeasuredFPS());
 	}
 });
+*/
 
 
 
