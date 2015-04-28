@@ -5,27 +5,51 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<script src="bower_components/jquery/dist/jquery.js" ></script> 
 		<script src="bower_components/easeljs/lib/easeljs-NEXT.combined.js" ></script>
-		<script src="node_modules/garfunkel/build/garfunkel.js" ></script>
+		<script src="bower_components/TweenJS/lib/tweenjs-NEXT.combined.js" ></script>
+		<script src="js/tools/drawpolygon.js"></script>
+
+		<script src="node_modules/garfunkel/garfunkel.js" ></script>
 		
 		<script src="js/tools/size.js" ></script>
 		<script src="js/tools/set.js"></script>
 		<script src="js/tools/consts.js"></script>
+		<script src="js/tools/utils.js"></script>
 		
 		<script src="js/pen.init.js"></script>
+		<script src="assets/audio.js"></script>
+		<script src="assets/effects.js"></script>
+		<script src="js/pen.assets.js"></script>
+		<script src="js/pen.snd.js"></script>
+		<script src="js/pen.ui.js"></script>
+		
+		<script src="js/objects/pen.levels.js"></script>
 		<script src="js/objects/pen.ship.js"></script>
+		<script src="js/objects/pen.enemy.js"></script>
+		<script src="js/objects/pen.elimination.js"></script>
 		<script src="js/objects/pen.background.js"></script>
 
 		<script src="js/pen.game.js"></script>
+		<script src="js/pen.draw.js"></script>
 		<script src="js/pen.js"></script>
 
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
 		<div id="container">
-			<div id="menu">
-				
+			<div id="instructions">
+				<img src="assets/instructions.png" >
+			</div>
+			<div id="message">
+				<h1></h1>
+				<p></p>
+			</div>
+			<div id="overlay">
+				<span id="fps"></span>
+				<span id="lives"></span>
 			</div>
 			<canvas id="mainCanvas" width="400" height="600"></canvas>
+			<canvas id="paintCanvas" width="400" height="600"></canvas>
 		</div>
+			
 	</body>
 </html>
